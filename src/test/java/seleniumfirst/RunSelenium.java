@@ -10,6 +10,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
+import java.util.List;
 
 public class RunSelenium {
 	public static void main(String[] args) {
@@ -47,6 +48,26 @@ public class RunSelenium {
                 By.cssSelector("a[href='/search?q=%23blockchain&src=typed_query&f=user']")
             ));
 	    people.click();
+	    
+	    try {
+            Thread.sleep(50000);  // Pause for 5000 milliseconds (5 seconds) Pause more for page loading and gain more data
+        } catch (InterruptedException e) {
+            e.printStackTrace();  // Handle the interrupted exception
+        }
+	    
+	    List<WebElement> users = driver.findElements(By.xpath("//div[@data-testid='cellInnerDiv']"));
+	    
+	    int size = users.size();
+	    System.out.println(size);
+	    
+	    for (WebElement user: users) {
+	    	String profileLink = user.findElement(By.tagName("a")).getAttribute("href");
+	    	
+	    	System.out.println(profileLink);
+	    	
+	    }
+	    
+	    
 	}
 
 }
