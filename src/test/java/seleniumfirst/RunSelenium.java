@@ -50,7 +50,7 @@ public class RunSelenium {
 	    people.click();
 	    
 	    try {
-            Thread.sleep(50000);  // Pause for 5000 milliseconds (5 seconds) Pause more for page loading and gain more data
+            Thread.sleep(5000);  // Pause for 5000 milliseconds (5 seconds) Pause more for page loading and gain more data
         } catch (InterruptedException e) {
             e.printStackTrace();  // Handle the interrupted exception
         }
@@ -62,9 +62,13 @@ public class RunSelenium {
 	    
 	    for (WebElement user: users) {
 	    	String profileLink = user.findElement(By.tagName("a")).getAttribute("href");
-	    	
 	    	System.out.println(profileLink);
 	    	
+	    	String displayname = user.findElement(By.xpath(".//div[contains(@dir, 'ltr')]/span")).getText();
+	    	System.out.println(displayname + '\n');
+	    	
+	    	String username = user.findElement(By.xpath(".//a[contains(@href, '/')]//span[contains(text(), '@')]")).getText();
+	    	System.out.println(username + '\n');
 	    }
 	    
 	    
