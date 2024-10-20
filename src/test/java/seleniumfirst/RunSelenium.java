@@ -31,7 +31,7 @@ public class RunSelenium {
 		
 		WebElement usernameField = wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.cssSelector("[autocapitalize='sentences'][autocomplete='username'][autocorrect='on'][name='text'][spellcheck='true']")));
-		usernameField.sendKeys("hihihahade31600");
+		usernameField.sendKeys("@HuyQuan82209440");
 		
 		WebElement nextButton = wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.cssSelector("[role='button'][type='button'][class=\"css-175oi2r r-sdzlij r-1phboty r-rs99b7 r-lrvibr r-ywje51 r-184id4b r-13qz1uu r-2yi16 r-1qi8awa r-3pj75a r-1loqt21 r-o7ynqc r-6416eg r-1ny4l3l\"]")));
@@ -39,7 +39,7 @@ public class RunSelenium {
 		
 		WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.cssSelector("[name=\"password\"][spellcheck=\"true\"]")));
-		passwordField.sendKeys("hoangkhochuhuhihihaha");
+		passwordField.sendKeys("nostand2");
 		
 		
 		WebElement loginButton = wait.until(ExpectedConditions.visibilityOfElementLocated(
@@ -86,7 +86,7 @@ public class RunSelenium {
 	    List<WebElement> users = driver.findElements(By.cssSelector("[data-testid='UserCell'][role='button']"));
 	    Set<String> listLink = new LinkedHashSet<>();
 
-	    for (int i = 0; i < 30; i++) {
+	    for (int i = 0; i < 50; i++) {
 
 	        try {
 	            Thread.sleep(2000);
@@ -96,21 +96,33 @@ public class RunSelenium {
 
 	        users = driver.findElements(By.cssSelector("[data-testid='UserCell'][role='button']"));
 
-	        if (i >= users.size()) {
-	            user = users.get(users.size() - 1);
-	        } else {
-	            user = users.get(i);
+//	        if (i >= users.size()) {
+//	            user = users.get(users.size() - 1);
+//	        } else {
+//	            user = users.get(i);
+//	        }
+	  
+
+	        
+	        for( int j = 0; j < users.size(); j++) {
+	        	user = users.get(j);
+	        	String href = user.findElement(By.tagName("a")).getAttribute("href");
+		        listLink.add(href);      
+		        System.out.println(href);
+		        
+		        if(j == users.size() - 1) {
+		        	user.sendKeys(Keys.ARROW_DOWN);
+		        }
 	        }
 
-	        user.sendKeys(Keys.ARROW_DOWN);
-
-	        String href = user.findElement(By.tagName("a")).getAttribute("href");
-	        listLink.add(href);      
-	        System.out.println(href);
+//	        String href = user.findElement(By.tagName("a")).getAttribute("href");
+//	        listLink.add(href);      
+//	        System.out.println(href);
 	        
 	    }
 	    
-	    String fileName = "output.csv";
+	    String fileName = "usersLink.csv"; // sửa code thành tạo các bảng có tên giống hashtag, vd 
+	    									// "blockchainUserLink.csv"
 
         
         try (CSVWriter writer = new CSVWriter(new FileWriter(fileName, true))) { // Set to true for append mode
@@ -122,6 +134,8 @@ public class RunSelenium {
         } catch (IOException e) {
             System.err.println("Error writing to file: " + e.getMessage());
         }
+        
+        // Tạm thời load được khoảng 500 users.
 	    	
 	    
 	    
