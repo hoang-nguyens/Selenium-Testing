@@ -3,6 +3,8 @@ package seleniumsecond;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -66,23 +68,131 @@ public class LoadUserInfor {
 		
 //		findFollowerAndFollowing();
 
-		Map<String, List<String>> tweetDataWithLinks = findTweetsAndRetweetsWithLinks();
-
-	    // Get the list of tweet and retweet links
-	    List<String> tweets = tweetDataWithLinks.get("tweets");
-	    List<String> retweets = tweetDataWithLinks.get("retweets");
+//		Map<String, List<String>> tweetDataWithLinks = findTweetsAndRetweetsWithLinks();
+//
+//	    // Get the list of tweet and retweet links
+//	    List<String> tweets = tweetDataWithLinks.get("tweets");
+//	    List<String> retweets = tweetDataWithLinks.get("retweets");
 
 	    // Print the tweet and retweet links
-	    System.out.println("Tweet Links:");
-	    for (String tweetLink : tweets) {
-	        System.out.println(tweetLink);
+//	    System.out.println("Tweet Links:");
+//	    for (String tweetLink : tweets) {
+//	        System.out.println(tweetLink);
+//	    }
+//
+//	    System.out.println("\nRetweet Links:");
+//	    for (String retweetLink : retweets) {
+//	        System.out.println(retweetLink);
+//	    }
+	    
+//	    String tweet1 = tweets.get(0);
+	    String tweet1 = "https://x.com/Bitcoin_Buddah/status/1844308200369135683"; // copy here for testing
+	    
+	    
+	    Map<String, Set<String>> result = findTweetsAndRetweetsComment(tweet1);
+
+	    // Retrieve and print the post owner
+	    Set<String> postOwner = result.get("PostOwner");
+	    if (postOwner != null && !postOwner.isEmpty()) {
+	        System.out.println("Post Owner: " + postOwner);
+	    } else {
+	        System.out.println("No post owner found.");
 	    }
 
-	    System.out.println("\nRetweet Links:");
-	    for (String retweetLink : retweets) {
-	        System.out.println(retweetLink);
+	    // Retrieve and print the user comments
+	    Set<String> userComments = result.get("UserComments");
+	    if (userComments != null && !userComments.isEmpty()) {
+	        System.out.println("User Comments: ");
+	        for (String user : userComments) {
+	            System.out.println(user);
+	        }
+	    } else {
+	        System.out.println("No user comments found.");
 	    }
+	    
+	    
 	}
+	
+	public static Map<String, Set<String>> findTweetsAndRetweetsComment(String link) {
+	    openNewWindow(link);
+
+	    Set<String> userNamesSet = new HashSet<>();
+	    String postOwner = null; // Variable to store the post owner's username
+
+	    JavascriptExecutor js = (JavascriptExecutor) driver;
+	    js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+	    try {
+	        Thread.sleep(2000); // Wait for new tweets to load (adjust as needed)
+	    } catch (InterruptedException e) {
+	        Thread.currentThread().interrupt(); // Restore interrupted status
+	    }
+
+	    for (int i = 0; i < 5; i++) {
+	        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-testid='User-Name']")));
+
+	        List<WebElement> usersComment = driver.findElements(By.cssSelector("[data-testid='User-Name']"));
+
+	        for (WebElement user : usersComment) {
+	            try {
+	                // Debugging: Print user element to inspect structure
+	                System.out.println(user.getAttribute("innerHTML"));
+
+	                // Wait for the <a> tag inside the user element to be visible
+	                WebElement linkElement = user.findElement(By.cssSelector("a[href*='/']"));
+
+	                // Ensure that the link element is visible
+	                wait.until(ExpectedConditions.visibilityOf(linkElement));
+
+	                String linkUser = linkElement.getAttribute("href");
+	                String username = linkUser.substring(linkUser.lastIndexOf("/") + 1);
+
+	                // If it's the first loop (i == 0) and postOwner is not set, save the post owner's username
+	                if (i == 0 && postOwner == null) {
+	                    postOwner = username;
+	                    System.out.println("Post owner: " + postOwner);
+	                }
+
+	                // Only add the username to the set if it's not the post owner
+	                if (!username.equals(postOwner)) {
+	                    userNamesSet.add(username);  // Add to set to ensure uniqueness
+	                }
+
+	            } catch (Exception e) {
+	                System.out.println("Error retrieving username: " + e.getMessage());
+	            }
+	        }
+
+	        js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+	        try {
+	            Thread.sleep(2000); // Wait for new tweets to load
+	        } catch (InterruptedException e) {
+	            Thread.currentThread().interrupt(); // Restore interrupted status
+	        }
+	    }
+
+	    // Create a Map to return both postOwner and user comments
+	    Map<String, Set<String>> result = new HashMap<>();
+	    
+	    Set<String> finalUserNamesSet = new LinkedHashSet<>();
+	    
+	    // Add post owner first
+	    if (postOwner != null) {
+	        Set<String> postOwnerSet = new HashSet<>();
+	        postOwnerSet.add(postOwner);
+	        result.put("PostOwner", postOwnerSet); // Store post owner in the map
+	    }
+
+	    // Add all user comments
+	    result.put("UserComments", userNamesSet);
+
+	    // Return the map with post owner and user comments
+	    return result;
+	}
+
+
+
+
+
 
 	public static Map<String, List<String>> findTweetsAndRetweetsWithLinks() {
 	    List<String> tweetLinks = new ArrayList<>();
