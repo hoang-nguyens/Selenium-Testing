@@ -31,7 +31,7 @@ public class RunSelenium {
 		
 		WebElement usernameField = wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.cssSelector("[autocapitalize='sentences'][autocomplete='username'][autocorrect='on'][name='text'][spellcheck='true']")));
-		usernameField.sendKeys("@HuyQuan82209440");
+		usernameField.sendKeys("hihihahade31600");
 		
 		WebElement nextButton = wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.cssSelector("[role='button'][type='button'][class=\"css-175oi2r r-sdzlij r-1phboty r-rs99b7 r-lrvibr r-ywje51 r-184id4b r-13qz1uu r-2yi16 r-1qi8awa r-3pj75a r-1loqt21 r-o7ynqc r-6416eg r-1ny4l3l\"]")));
@@ -39,7 +39,7 @@ public class RunSelenium {
 		
 		WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.cssSelector("[name=\"password\"][spellcheck=\"true\"]")));
-		passwordField.sendKeys("nostand2");
+		passwordField.sendKeys("stopthis");
 		
 		
 		WebElement loginButton = wait.until(ExpectedConditions.visibilityOfElementLocated(
@@ -48,13 +48,16 @@ public class RunSelenium {
 		
 		WebElement searchField = wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.cssSelector("[placeholder='Search']")));
-	    searchField.sendKeys("#blockchain");
+		
+		String keyword = "SmartContracts"; // cần tạo list các keyword thay vì chạy thủ công thế này
+		String hashtag = "#" + keyword;
+		
+		
+	    searchField.sendKeys(hashtag);
 	    searchField.submit();
-	      
-//	    Actions act = new Actions(driver);
 	    
 	    WebElement people = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("a[href='/search?q=%23blockchain&src=typed_query&f=user']")
+                By.cssSelector("a[href='/search?q=%23" + keyword + "&src=typed_query&f=user']")
             ));
 	    people.click();
 	    
@@ -63,30 +66,13 @@ public class RunSelenium {
         } catch (InterruptedException e) {
             e.printStackTrace();  
         }
-	    
-//	    List<WebElement> users = driver.findElements(By.xpath("//div[@data-testid='cellInnerDiv']"));
-//	    
-//	    int size = users.size();
-//	    System.out.println(size);
-//	    
-//	    for (WebElement user: users) {
-//	    	String profileLink = user.findElement(By.tagName("a")).getAttribute("href");
-//	    	System.out.println(profileLink);
-//	    	
-//	    	String displayname = user.findElement(By.xpath(".//div[contains(@dir, 'ltr')]/span")).getText();
-//	    	System.out.println(displayname);
-//	    	
-//	    	String username = user.findElement(By.xpath(".//a[contains(@href, '/')]//span[contains(text(), '@')]")).getText();
-//	    	System.out.println(username + '\n');
-//	    }
-	    
-	    Actions act = new Actions(driver);
+	 
 	    WebElement user;
 
 	    List<WebElement> users = driver.findElements(By.cssSelector("[data-testid='UserCell'][role='button']"));
 	    Set<String> listLink = new LinkedHashSet<>();
 
-	    for (int i = 0; i < 50; i++) {
+	    for (int i = 0; i < 20; i++) {
 
 	        try {
 	            Thread.sleep(2000);
@@ -121,7 +107,7 @@ public class RunSelenium {
 	        
 	    }
 	    
-	    String fileName = "usersLink.csv"; // sửa code thành tạo các bảng có tên giống hashtag, vd 
+	    String fileName = keyword + "UsersLink.csv"; // sửa code thành tạo các bảng có tên giống hashtag, vd 
 	    									// "blockchainUserLink.csv"
 
         

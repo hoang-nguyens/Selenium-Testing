@@ -6,16 +6,19 @@
   
   <dependencies>
   
-  <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
-	<dependency>
-	    <groupId>org.seleniumhq.selenium</groupId>
-	    <artifactId>selenium-java</artifactId>
-	    <version>4.25.0</version>
-	</dependency>
+    <!-- Selenium Dependency -->
+    <dependency>
+        <groupId>org.seleniumhq.selenium</groupId>
+        <artifactId>selenium-java</artifactId>
+        <version>4.25.0</version>
+    </dependency>
 
-  
+    <!-- OpenCSV Dependency -->
+    <dependency>
+        <groupId>com.opencsv</groupId>
+        <artifactId>opencsv</artifactId>
+        <version>5.7.1</version> <!-- Check for the latest version -->
+    </dependency>
+
   </dependencies>
-  
-  
-  
 </project>
