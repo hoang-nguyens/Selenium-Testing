@@ -1,13 +1,17 @@
 package seleniumsecond;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -25,6 +29,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.opencsv.CSVWriter;
+
 public class LoadUserInfor {
 	public static WebDriver driver;  
     public static WebDriverWait wait;
@@ -32,91 +38,53 @@ public class LoadUserInfor {
 	public static void main(String[] args) {
 		login();
 		
-		//List<String> links = readLinksFromCSV("D:\\OOP Project 2024.1\\projecttest\\bitcoinUsersLink.csv");
+//		List<String> links = readLinksFromCSV("D:\\OOP Project 2024.1\\projecttest\\Web3UsersLink.csv");
 
         // Process a specific range of links (example: index 0 to 9)
-        int startIndex = 2;
-        int endIndex = 10;
-
-        // Process the links range
-        //processLinksRange(links, startIndex, endIndex);
-        processKOLsData("D:\\OOP Project 2024.1\\projecttest\\result.csv", 2, 2);
-        
-     
+//        int startIndex = 0;
+//        int endIndex = 2;
+//
+//        // Process the links range
+//        //processLinksRange(links, startIndex, endIndex);
+//        processKOLsData("D:\\OOP Project 2024.1\\projecttest\\result.csv", startIndex, endIndex);
 		
-//		
-//		String newTabUrl = "https://x.com/Bitcoin_Buddah";
-//		String newTabUrl2 = "https://x.com/Bitcoin/verified_followers";
-//		String newTabUrl3 = "https://x.com/Bitcoin/followers";
-//		String newTabUrl4 = "https://x.com/Bitcoin/following";
-//		
-//		openNewWindow(newTabUrl);
-//		openNewWindow(newTabUrl2);
-//		
-//		try {
-//            Thread.sleep(5000);  
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();  
-//        }
-//		     
-//		closeAllTabsExceptOriginal();
-		
-		
-//		findFollowerAndFollowing();
+		try {
+            // Specify the link (Twitter URL or any relevant page with tweets)
+            String link = "https://x.com/elonmusk"; // Replace with actual URL
 
-//		Map<String, List<String>> tweetDataWithLinks = findTweetsAndRetweetsWithLinks();
-//
-//	    // Get the list of tweet and retweet links
-//	    List<String> tweets = tweetDataWithLinks.get("tweets");
-//	    List<String> retweets = tweetDataWithLinks.get("retweets");
+            // Call the method to get tweets and retweets with links
+            Map<String, List<String>> tweetData = findTweetsAndRetweetsWithLinks(link);
 
-	    // Print the tweet and retweet links
-//	    System.out.println("Tweet Links:");
-//	    for (String tweetLink : tweets) {
-//	        System.out.println(tweetLink);
-//	    }
-//
-//	    System.out.println("\nRetweet Links:");
-//	    for (String retweetLink : retweets) {
-//	        System.out.println(retweetLink);
-//	    }
-	    
-//	    String tweet1 = tweets.get(0);
-//	    String tweet1 = "https://x.com/Bitcoin_Buddah/status/1844308200369135683"; // copy here for testing
-//	    
-//	    
-//	    Map<String, Set<String>> result = findTweetsAndRetweetsComment(tweet1);
-//
-//	    // Retrieve and print the post owner
-//	    Set<String> postOwner = result.get("PostOwner");
-//	    if (postOwner != null && !postOwner.isEmpty()) {
-//	        System.out.println("Post Owner: " + postOwner);
-//	    } else {
-//	        System.out.println("No post owner found.");
-//	    }
-//
-//	    // Retrieve and print the user comments
-//	    Set<String> userComments = result.get("UserComments");
-//	    if (userComments != null && !userComments.isEmpty()) {
-//	        System.out.println("User Comments: ");
-//	        for (String user : userComments) {
-//	            System.out.println(user);
-//	        }
-//	    } else {
-//	        System.out.println("No user comments found.");
-//	    }
-	    
-	    
+            // Print out the collected data (tweets and retweets with links)
+            System.out.println("Tweets:");
+            for (String tweetLink : tweetData.get("tweets")) {
+                System.out.println(tweetLink);
+            }
+
+            System.out.println("Retweets:");
+            for (String retweetLink : tweetData.get("retweets")) {
+                System.out.println(retweetLink);
+            }
+        } finally {
+            // Clean up and close the driver
+            driver.quit();
+        }
 	}
 	
 	public static void login() {
         driver = new ChromeDriver(); // Ensure driver is initialized
         driver.get("https://twitter.com/login");
-        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        List<String> accounts = new ArrayList<>();
+        accounts.add("hihihahade31600");
+        accounts.add("HoangNg31600");
+        accounts.add("Hngy0403");
+        accounts.add("jupite97964");
+        accounts.add("phan315918");
+        
         WebElement usernameField = wait.until(ExpectedConditions.visibilityOfElementLocated(
             By.cssSelector("[autocapitalize='sentences'][autocomplete='username'][autocorrect='on'][name='text'][spellcheck='true']")));
-        usernameField.sendKeys("hihihahade31600");
+        usernameField.sendKeys(accounts.get(2)); // hihihahade31600 HoangNg31600 Hngy0403 jupite97964 jokererror45300 
 
         WebElement nextButton = wait.until(ExpectedConditions.visibilityOfElementLocated(
             By.cssSelector("[role='button'][type='button'][class=\"css-175oi2r r-sdzlij r-1phboty r-rs99b7 r-lrvibr r-ywje51 r-184id4b r-13qz1uu r-2yi16 r-1qi8awa r-3pj75a r-1loqt21 r-o7ynqc r-6416eg r-1ny4l3l\"]")));
@@ -124,7 +92,7 @@ public class LoadUserInfor {
 
         WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(
             By.cssSelector("[name=\"password\"][spellcheck=\"true\"]")));
-        passwordField.sendKeys("stopthis");
+        passwordField.sendKeys("stopthis"); //	stopthis hieuabcd123
 
         WebElement loginButton = wait.until(ExpectedConditions.visibilityOfElementLocated(
             By.cssSelector("[data-testid=\"LoginForm_Login_Button\"][type=\"button\"]")));
@@ -137,26 +105,32 @@ public class LoadUserInfor {
 	        String link = links.get(i).replace("\"", "").trim(); // Remove quotes and trim spaces
 	        System.out.println("Processing link: " + link);
 
-	        // Concatenate the URLs correctly
-	        String followersUrl = link + "/followers";
-	        String verifiedFollowersUrl = link + "/verified_followers";
-	        String followingUrl = link + "/following";
+	        try {
+	            // Concatenate the URLs correctly
+	            String followersUrl = link + "/followers";
+	            String verifiedFollowersUrl = link + "/verified_followers";
+	            String followingUrl = link + "/following";
 
-	        // Debugging print statement to verify the URLs
-	        System.out.println("Followers URL: " + followersUrl); // Ensure this is correct
-	        System.out.println("Verified Followers URL: " + verifiedFollowersUrl); // Ensure this is correct
-	        System.out.println("Following URL: " + followingUrl); // Ensure this is correct
+	            // Debugging print statements to verify the URLs
+	            System.out.println("Followers URL: " + followersUrl); 
+	            System.out.println("Verified Followers URL: " + verifiedFollowersUrl); 
+	            System.out.println("Following URL: " + followingUrl);
 
-	        // Collect the data
-	        List<String> followers = findFollowerAndFollowing(followersUrl);
-	        List<String> verifiedFollowers = findFollowerAndFollowing(verifiedFollowersUrl);
-	        List<String> following = findFollowerAndFollowing(followingUrl);
+	            // Collect the data
+	            List<String> followers = findFollowerAndFollowing(followersUrl);
+	            List<String> verifiedFollowers = findFollowerAndFollowing(verifiedFollowersUrl);
+	            List<String> following = findFollowerAndFollowing(followingUrl);
 
-	        // Write the results to CSV
-	        writeResultsToCSV("result.csv", link, followers, verifiedFollowers, following);
-
-	        // Close all tabs except the original one to save memory
-	        closeAllTabsExceptOriginal();
+	            // Write the results to CSV
+	            writeResultsToCSV("result.csv", link, followers, verifiedFollowers, following);
+	        } catch (Exception e) {
+	            // Handle any error, log it, and proceed to the next link
+	            System.err.println("Error processing link: " + link);
+	            e.printStackTrace();
+	        } finally {
+	            // Close all tabs except the original one to save memory
+	            closeAllTabsExceptOriginal();
+	        }
 	    }
 	}
 	
@@ -182,64 +156,116 @@ public class LoadUserInfor {
             e.printStackTrace();
         }
     }
-	public static void processKOLsData(String filePath, int startIndex, int endIndex) {
-	    List<String[]> rows = readCSV(filePath);
-	    List<String[]> updatedRows = new ArrayList<>();
+	
+	
+	    public static void processKOLsData(String filePath, int startIndex, int endIndex) {
+	        List<String[]> rows = readCSV(filePath); // Assuming readCSV method exists to read the CSV data.
+	        File jsonFile = new File("all.json");
 
-	    // Update header with new columns for post-owner and comments
-	    String[] header = rows.get(0);
-	    header = Arrays.copyOf(header, header.length + 3);
-	    header[header.length - 3] = "Retweet Post Owners";
-	    header[header.length - 2] = "Retweet Comments";
-	    header[header.length - 1] = "Tweet Comments";
-	    updatedRows.add(header);
+	        JSONArray allData = new JSONArray();
 
-	    // Iterate through the rows in the specified range
-	    for (int i = startIndex; i <= endIndex && i < rows.size(); i++) {
-	        String[] row = rows.get(i);
-	        String kolUsername = row[0].replace("\"", "").trim(); // Get the username of the KOL
-	        String link = "https://x.com/" + kolUsername;  // Construct the KOL URL
-	        System.out.println("Processing KOL: " + link);
-
-	        // Get tweets and retweets with links
-	        Map<String, List<String>> tweetData = findTweetsAndRetweetsWithLinks(link);
-
-	        // Maps to store post-owner info and comments
-	        Map<String, Set<String>> retweetPostOwnerMap = new HashMap<>();
-	        Map<String, Set<String>> tweetCommentsMap = new HashMap<>();
-	        Map<String, Set<String>> retweetCommentsMap = new HashMap<>();
-
-	        // Iterate through retweets and find comments
-	        for (String retweetLink : tweetData.get("retweets")) {
-	            // Get the post owner and comments for each retweet
-	            Map<String, Set<String>> retweetComments = findTweetsAndRetweetsComment(retweetLink);
-	            retweetPostOwnerMap.put(retweetLink, retweetComments.get("PostOwner"));
-	            retweetCommentsMap.put(retweetLink, retweetComments.get("UserComments"));
-	            closeAllTabsExceptOriginal();
+	        // Load existing JSON data if the file exists
+	        if (jsonFile.exists()) {
+	            try (FileReader reader = new FileReader(jsonFile)) {
+	                StringBuilder content = new StringBuilder();
+	                int ch;
+	                while ((ch = reader.read()) != -1) {
+	                    content.append((char) ch);
+	                }
+	                allData = new JSONArray(content.toString());
+	            } catch (IOException e) {
+	                System.err.println("Error reading existing JSON file: " + e.getMessage());
+	            }
 	        }
 
-	        // Iterate through tweets and find comments
-	        for (String tweetLink : tweetData.get("tweets")) {
-	            // Get the post owner and comments for each tweet
-	            Map<String, Set<String>> tweetComments = findTweetsAndRetweetsComment(tweetLink);
-	            tweetCommentsMap.put(tweetLink, tweetComments.get("UserComments"));
-	            closeAllTabsExceptOriginal();
+	        // Process rows from startIndex to endIndex
+	        for (int i = startIndex; i <= endIndex && i < rows.size(); i++) {
+	            try {
+	                String[] row = rows.get(i);
+	                String kolUsername = row[0].replace("\"", "").trim();
+	                String link = "https://x.com/" + kolUsername;
+
+	                System.out.println("Processing KOL: " + link);
+
+	                // Simulated method to fetch tweets and retweets with links
+	                Map<String, List<String>> tweetData = findTweetsAndRetweetsWithLinks(link);
+
+	                // Simulated maps to hold data for each KOL
+	                Map<String, Set<String>> retweetPostOwnerMap = new HashMap<>();
+	                Map<String, Set<String>> retweetCommentsMap = new HashMap<>();
+	                Map<String, Set<String>> tweetCommentsMap = new HashMap<>();
+
+	                // Process retweets
+	                List<String> retweets = tweetData.get("retweets");
+	                for (int j = 0; j < Math.min(retweets.size(), 5); j++) {
+	                    String retweetLink = retweets.get(j);
+	                    Map<String, Set<String>> retweetComments = findTweetsAndRetweetsComment(retweetLink);
+
+	                    retweetPostOwnerMap.put(retweetLink, retweetComments.get("PostOwner"));
+	                    retweetCommentsMap.put(retweetLink, retweetComments.get("UserComments"));
+	                    closeAllTabsExceptOriginal();
+	                }
+
+	                // Process tweets
+	                List<String> tweets = tweetData.get("tweets");
+	                for (int j = 0; j < Math.min(tweets.size(), 5); j++) {
+	                    String tweetLink = tweets.get(j);
+	                    Map<String, Set<String>> tweetComments = findTweetsAndRetweetsComment(tweetLink);
+
+	                    tweetCommentsMap.put(tweetLink, tweetComments.get("UserComments"));
+	                    closeAllTabsExceptOriginal();
+	                }
+
+	                // Create a JSON object for the current KOL
+	                JSONObject kolData = new JSONObject();
+	                kolData.put("KOL", kolUsername);
+	                kolData.put("RetweetPostOwners", retweetPostOwnerMap);
+	                kolData.put("RetweetComments", retweetCommentsMap);
+	                kolData.put("TweetComments", tweetCommentsMap);
+
+	                // Append the JSON object to the JSONArray
+	                allData.put(kolData);
+
+	            } catch (Exception e) {
+	                System.err.println("Error processing KOL: " + rows.get(i)[0]);
+	                e.printStackTrace();
+	            }
 	        }
 
-	        // Create a new list to hold the row with additional columns
-	        List<String> newRow = new ArrayList<>(Arrays.asList(row));
-
-	        // Add new columns to the row
-	        newRow.add(retweetPostOwnerMap.toString()); // 5th column: Retweet post owners map
-	        newRow.add(retweetCommentsMap.toString()); // 6th column: Retweet comments map
-	        newRow.add(tweetCommentsMap.toString()); // 7th column: Tweet comments map
-
-	        // Add the updated row to the list
-	        updatedRows.add(newRow.toArray(new String[0])); // Convert list back to array before adding
+	        // Write updated JSON array back to the file
+	        try (FileWriter writer = new FileWriter(jsonFile)) {
+	            writer.write(allData.toString(4)); // Pretty-print JSON with an indentation of 4 spaces
+	            System.out.println("Data successfully written to all.json");
+	        } catch (IOException e) {
+	            System.err.println("Error writing to JSON file: " + e.getMessage());
+	        }
 	    }
+	
+	
+	public static void writeToJSONFile(String filePath, JSONArray jsonArray) {
+	    try (FileWriter fileWriter = new FileWriter(filePath)) {
+	        fileWriter.write(jsonArray.toString(4)); // Pretty-print with indentation
+	        System.out.println("Data successfully saved to " + filePath);
+	    } catch (IOException e) {
+	        System.err.println("Error writing to JSON file: " + filePath);
+	        e.printStackTrace();
+	    }
+	}
 
-	    // Write the updated rows (with new columns) to the CSV file
-	    writeToCSV(filePath, updatedRows);
+
+	
+
+	public static void appendToCSV(String filePath, List<String[]> rows) {
+	    try (FileWriter writer = new FileWriter(filePath, true);
+	         CSVWriter csvWriter = new CSVWriter(writer)) {
+
+	        for (String[] row : rows) {
+	            csvWriter.writeNext(row);
+	        }
+	    } catch (IOException e) {
+	        System.err.println("Error appending to CSV file: " + filePath);
+	        e.printStackTrace();
+	    }
 	}
 
 
@@ -293,7 +319,7 @@ public class LoadUserInfor {
 	        Thread.currentThread().interrupt(); // Restore interrupted status
 	    }
 
-	    for (int i = 0; i < 5; i++) {
+	    for (int i = 0; i < 3; i++) {
 	        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-testid='User-Name']")));
 
 	        List<WebElement> usersComment = driver.findElements(By.cssSelector("[data-testid='User-Name']"));
@@ -339,7 +365,7 @@ public class LoadUserInfor {
 	    // Create a Map to return both postOwner and user comments
 	    Map<String, Set<String>> result = new HashMap<>();
 	    
-	    Set<String> finalUserNamesSet = new LinkedHashSet<>();
+	    
 	    
 	    // Add post owner first
 	    if (postOwner != null) {
@@ -361,10 +387,13 @@ public class LoadUserInfor {
 
 
 	public static Map<String, List<String>> findTweetsAndRetweetsWithLinks(String link) {
-		openNewWindow(link);
+	    openNewWindow(link);
 	    List<String> tweetLinks = new ArrayList<>();
 	    List<String> retweetLinks = new ArrayList<>();
 	    JavascriptExecutor js = (JavascriptExecutor) driver;
+
+	    // Extract the username from the provided link (e.g., https://x.com/elonmusk -> elonmusk)
+	    String username = link.substring(link.lastIndexOf("/") + 1);
 
 	    // Initial scroll to load some tweets
 	    js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
@@ -375,37 +404,25 @@ public class LoadUserInfor {
 	    }
 
 	    // Loop to keep scrolling and collecting tweets
-	    for (int i = 0; i < 5; i++) { // Adjust the number of iterations to load more tweets
+	    for (int i = 0; i < 3; i++) { // Adjust the number of iterations to load more tweets
 	        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-testid='tweet']")));
 
 	        // Collect current tweets
 	        List<WebElement> tweetElements = driver.findElements(By.cssSelector("[data-testid='tweet']"));
 
 	        for (WebElement tweetElement : tweetElements) {
-	            boolean isRetweet = false;
-
-	            // Check for retweet indicator
-	            try {
-	                WebElement retweetIndicator = tweetElement.findElement(By.xpath(".//*[contains(text(), 'reposted') or contains(@aria-label, 'reposted')]"));
-	                if (retweetIndicator.isDisplayed()) {
-	                    isRetweet = true;
-	                }
-	            } catch (NoSuchElementException e) {
-	                isRetweet = false; 
-	            } catch (Exception e) {
-	                // Log error if needed
-	            }
-
 	            // Extract the link from the tweet or retweet
 	            try {
 	                WebElement linkElement = tweetElement.findElement(By.xpath(".//a[contains(@href, '/status/')]"));
 	                String postLink = linkElement.getAttribute("href");
 
-	                // Add the post link to the appropriate list
-	                if (isRetweet) {
-	                    retweetLinks.add(postLink);
-	                } else {
+	                // Check if the post link contains the username (indicating it's from the correct user)
+	                if (postLink.contains(username)) {
+	                    // If the link contains the username, it's a tweet
 	                    tweetLinks.add(postLink);
+	                } else {
+	                    // If the link doesn't contain the username, it's a retweet
+	                    retweetLinks.add(postLink);
 	                }
 	            } catch (NoSuchElementException e) {
 	                // If no link is found, skip this element
@@ -433,6 +450,7 @@ public class LoadUserInfor {
 
 	    return tweetDataWithLinks;
 	}
+
 
 	
 	
