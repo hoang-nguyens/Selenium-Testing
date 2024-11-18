@@ -36,42 +36,67 @@ public class LoadUserInfor {
     public static WebDriverWait wait;
 
 	public static void main(String[] args) {
-		login();
 		
-//		List<String> links = readLinksFromCSV("D:\\OOP Project 2024.1\\projecttest\\Web3UsersLink.csv");
+		login(0);
+		
+		String testLink = "https://x.com/elonmusk";
 
-        // Process a specific range of links (example: index 0 to 9)
-//        int startIndex = 0;
-//        int endIndex = 2;
+        // Call the method and retrieve the results
+        Map<String, List> result = findTweetsAndRetweetsWithLinks(testLink);
+
+        // Print the results
+        System.out.println("Tweets:");
+        List<String> tweets = (List<String>) result.get("tweets");
+        tweets.forEach(System.out::println);
+
+        System.out.println("\nRetweets:");
+        List<String> retweets = (List<String>) result.get("retweets");
+        retweets.forEach(System.out::println);
+
+        System.out.println("\nFollowers:");
+        List<String> followers = (List<String>) result.get("followers");
+        System.out.println(followers);
+		
+		
+////		List<String> links = readLinksFromCSV("D:\\OOP Project 2024.1\\projecttest\\Web3UsersLink.csv");
 //
-//        // Process the links range
-//        //processLinksRange(links, startIndex, endIndex);
+//        // Process a specific range of links (example: index 0 to 9)
+//        int startIndex = 3;
+//        int endIndex = 4;
+
+        // Process the links range
+        //processLinksRange(links, startIndex, endIndex);
 //        processKOLsData("D:\\OOP Project 2024.1\\projecttest\\result.csv", startIndex, endIndex);
-		
-		try {
-            // Specify the link (Twitter URL or any relevant page with tweets)
-            String link = "https://x.com/elonmusk"; // Replace with actual URL
+//		int startIndex = 53;
+//		int batchSize = 3; // Number of KOLs to process per iteration
+//		int totalIterations = 10;
+//		int accountsCount = 5; // Total accounts available for login
+//
+//		for (int i = 0; i < totalIterations; i++) {
+//		    int accountIndex = i % accountsCount; // Cycle through accounts
+//		    try {
+//		        login(accountIndex); // Login with the current account
+//		        processKOLsData("D:\\OOP Project 2024.1\\projecttest\\result.csv", startIndex, startIndex + batchSize - 1);
+//		        startIndex += batchSize; // Move to the next batch of KOLs
+//		        System.out.println("Processed up to startIndex: " + startIndex);
+//		    } catch (Exception e) {
+//		        System.err.println("Error during iteration " + i + ": " + e.getMessage());
+//		        e.printStackTrace();
+//		    } finally {
+//		        // Ensure the driver is closed after each iteration to free resources
+//		        if (driver != null) {
+//		            try {
+//		                driver.quit();
+//		            } catch (Exception e) {
+//		                System.err.println("Error closing driver: " + e.getMessage());
+//		            }
+//		        }
+//		    }
+//		}
 
-            // Call the method to get tweets and retweets with links
-            Map<String, List<String>> tweetData = findTweetsAndRetweetsWithLinks(link);
-
-            // Print out the collected data (tweets and retweets with links)
-            System.out.println("Tweets:");
-            for (String tweetLink : tweetData.get("tweets")) {
-                System.out.println(tweetLink);
-            }
-
-            System.out.println("Retweets:");
-            for (String retweetLink : tweetData.get("retweets")) {
-                System.out.println(retweetLink);
-            }
-        } finally {
-            // Clean up and close the driver
-            driver.quit();
-        }
 	}
 	
-	public static void login() {
+	public static void login(int i) {
         driver = new ChromeDriver(); // Ensure driver is initialized
         driver.get("https://twitter.com/login");
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -84,7 +109,7 @@ public class LoadUserInfor {
         
         WebElement usernameField = wait.until(ExpectedConditions.visibilityOfElementLocated(
             By.cssSelector("[autocapitalize='sentences'][autocomplete='username'][autocorrect='on'][name='text'][spellcheck='true']")));
-        usernameField.sendKeys(accounts.get(2)); // hihihahade31600 HoangNg31600 Hngy0403 jupite97964 jokererror45300 
+        usernameField.sendKeys(accounts.get(i)); // hihihahade31600 HoangNg31600 Hngy0403 jupite97964 jokererror45300 
 
         WebElement nextButton = wait.until(ExpectedConditions.visibilityOfElementLocated(
             By.cssSelector("[role='button'][type='button'][class=\"css-175oi2r r-sdzlij r-1phboty r-rs99b7 r-lrvibr r-ywje51 r-184id4b r-13qz1uu r-2yi16 r-1qi8awa r-3pj75a r-1loqt21 r-o7ynqc r-6416eg r-1ny4l3l\"]")));
@@ -98,6 +123,8 @@ public class LoadUserInfor {
             By.cssSelector("[data-testid=\"LoginForm_Login_Button\"][type=\"button\"]")));
         loginButton.click();
     }
+	
+	
 	
 	// Method to process links in the given range
 	public static void processLinksRange(List<String> links, int startIndex, int endIndex) {
@@ -158,89 +185,112 @@ public class LoadUserInfor {
     }
 	
 	
-	    public static void processKOLsData(String filePath, int startIndex, int endIndex) {
-	        List<String[]> rows = readCSV(filePath); // Assuming readCSV method exists to read the CSV data.
-	        File jsonFile = new File("all.json");
+	public static void processKOLsData(String filePath, int startIndex, int endIndex) {
+	    List<String[]> rows = readCSV(filePath); // Assuming readCSV method exists to read the CSV data.
+	    File jsonFile = new File("all.json");
 
-	        JSONArray allData = new JSONArray();
+	    JSONObject allData = new JSONObject();
 
-	        // Load existing JSON data if the file exists
-	        if (jsonFile.exists()) {
-	            try (FileReader reader = new FileReader(jsonFile)) {
-	                StringBuilder content = new StringBuilder();
-	                int ch;
-	                while ((ch = reader.read()) != -1) {
-	                    content.append((char) ch);
-	                }
-	                allData = new JSONArray(content.toString());
-	            } catch (IOException e) {
-	                System.err.println("Error reading existing JSON file: " + e.getMessage());
+	    // Load or initialize JSON data
+	    if (jsonFile.exists()) {
+	        try (FileReader reader = new FileReader(jsonFile)) {
+	            StringBuilder content = new StringBuilder();
+	            int ch;
+	            while ((ch = reader.read()) != -1) {
+	                content.append((char) ch);
 	            }
-	        }
 
-	        // Process rows from startIndex to endIndex
-	        for (int i = startIndex; i <= endIndex && i < rows.size(); i++) {
-	            try {
-	                String[] row = rows.get(i);
-	                String kolUsername = row[0].replace("\"", "").trim();
-	                String link = "https://x.com/" + kolUsername;
-
-	                System.out.println("Processing KOL: " + link);
-
-	                // Simulated method to fetch tweets and retweets with links
-	                Map<String, List<String>> tweetData = findTweetsAndRetweetsWithLinks(link);
-
-	                // Simulated maps to hold data for each KOL
-	                Map<String, Set<String>> retweetPostOwnerMap = new HashMap<>();
-	                Map<String, Set<String>> retweetCommentsMap = new HashMap<>();
-	                Map<String, Set<String>> tweetCommentsMap = new HashMap<>();
-
-	                // Process retweets
-	                List<String> retweets = tweetData.get("retweets");
-	                for (int j = 0; j < Math.min(retweets.size(), 5); j++) {
-	                    String retweetLink = retweets.get(j);
-	                    Map<String, Set<String>> retweetComments = findTweetsAndRetweetsComment(retweetLink);
-
-	                    retweetPostOwnerMap.put(retweetLink, retweetComments.get("PostOwner"));
-	                    retweetCommentsMap.put(retweetLink, retweetComments.get("UserComments"));
-	                    closeAllTabsExceptOriginal();
-	                }
-
-	                // Process tweets
-	                List<String> tweets = tweetData.get("tweets");
-	                for (int j = 0; j < Math.min(tweets.size(), 5); j++) {
-	                    String tweetLink = tweets.get(j);
-	                    Map<String, Set<String>> tweetComments = findTweetsAndRetweetsComment(tweetLink);
-
-	                    tweetCommentsMap.put(tweetLink, tweetComments.get("UserComments"));
-	                    closeAllTabsExceptOriginal();
-	                }
-
-	                // Create a JSON object for the current KOL
-	                JSONObject kolData = new JSONObject();
-	                kolData.put("KOL", kolUsername);
-	                kolData.put("RetweetPostOwners", retweetPostOwnerMap);
-	                kolData.put("RetweetComments", retweetCommentsMap);
-	                kolData.put("TweetComments", tweetCommentsMap);
-
-	                // Append the JSON object to the JSONArray
-	                allData.put(kolData);
-
-	            } catch (Exception e) {
-	                System.err.println("Error processing KOL: " + rows.get(i)[0]);
-	                e.printStackTrace();
+	            // Parse existing JSON data if not empty
+	            if (content.length() > 0) {
+	                allData = new JSONObject(content.toString());
 	            }
+	        } catch (Exception e) {
+	            System.err.println("Error reading or parsing all.json: " + e.getMessage());
+	            allData = new JSONObject(); // Initialize as empty JSONObject if parsing fails
 	        }
+	    } else {
+	        // If file doesn't exist, start with an empty JSON object
+	        allData = new JSONObject();
+	    }
 
-	        // Write updated JSON array back to the file
-	        try (FileWriter writer = new FileWriter(jsonFile)) {
-	            writer.write(allData.toString(4)); // Pretty-print JSON with an indentation of 4 spaces
-	            System.out.println("Data successfully written to all.json");
-	        } catch (IOException e) {
-	            System.err.println("Error writing to JSON file: " + e.getMessage());
+	    // Process rows from startIndex to endIndex
+	    for (int i = startIndex; i <= endIndex && i < rows.size(); i++) {
+	        try {
+	            String[] row = rows.get(i);
+	            String kolUsername = row[0].replace("\"", "").trim();
+	            System.out.println("Processing KOL: " + kolUsername);
+
+	            // Simulated method to fetch tweets and retweets with links
+	            Map<String, List> tweetData = findTweetsAndRetweetsWithLinks("https://x.com/" + kolUsername);
+
+	            // Maps to store processed data for this KOL
+	            Map<String, String> repostOwnerMap = new HashMap<>();
+	            Map<String, List<String>> tweetCommentsMap = new HashMap<>();
+	            Map<String, List<String>> retweetCommentsMap = new HashMap<>();
+
+	            // Process retweets
+	            List<String> retweets = tweetData.get("retweets");
+	            for (int j = 0; j < Math.min(retweets.size(), 5); j++) {
+	                String retweetLink = retweets.get(j);
+	                String retweetId = extractPostId(retweetLink); // Extract post ID
+	                Map<String, Set<String>> retweetComments = findTweetsAndRetweetsComment(retweetLink);
+
+	                // Only add post owners who are not the KOL
+	                Set<String> postOwners = retweetComments.get("PostOwner");
+	                for (String owner : postOwners) {
+	                    if (!owner.equals(kolUsername)) {
+	                        repostOwnerMap.put(retweetId, owner);
+	                    }
+	                }
+
+	                // Add comments for this retweet
+	                Set<String> comments = retweetComments.get("UserComments");
+	                retweetCommentsMap.put(retweetId, new ArrayList<>(comments));
+	            }
+
+	            // Process tweets
+	            List<String> tweets = tweetData.get("tweets");
+	            for (int j = 0; j < Math.min(tweets.size(), 5); j++) {
+	                String tweetLink = tweets.get(j);
+	                String tweetId = extractPostId(tweetLink); // Extract post ID
+	                Map<String, Set<String>> tweetComments = findTweetsAndRetweetsComment(tweetLink);
+
+	                // Add comments for this tweet
+	                Set<String> comments = tweetComments.get("UserComments");
+	                tweetCommentsMap.put(tweetId, new ArrayList<>(comments));
+	            }
+
+	            // Create JSON object for this KOL
+	            JSONObject kolData = new JSONObject();
+	            kolData.put("repostOwner", repostOwnerMap);
+	            kolData.put("tweetComments", tweetCommentsMap);
+	            kolData.put("retweetComments", retweetCommentsMap);
+
+	            // Add to main JSON object
+	            allData.put(kolUsername, kolData);
+
+	        } catch (Exception e) {
+	            System.err.println("Error processing KOL at row " + i + ": " + e.getMessage());
+	            e.printStackTrace();
 	        }
 	    }
-	
+
+	    // Write updated JSON data to the file
+	    try (FileWriter writer = new FileWriter(jsonFile)) {
+	        writer.write(allData.toString(4)); // Pretty-print JSON with 4-space indentation
+	        System.out.println("Data successfully written to all.json");
+	    } catch (IOException e) {
+	        System.err.println("Error writing to all.json: " + e.getMessage());
+	    }
+	}
+
+
+	// Helper method to extract the post ID from a link
+	public static String extractPostId(String link) {
+	    // Assuming the ID is the last part of the URL after the last slash (/)
+	    return link.substring(link.lastIndexOf("/") + 1);
+	}
+
 	
 	public static void writeToJSONFile(String filePath, JSONArray jsonArray) {
 	    try (FileWriter fileWriter = new FileWriter(filePath)) {
@@ -376,6 +426,7 @@ public class LoadUserInfor {
 
 	    // Add all user comments
 	    result.put("UserComments", userNamesSet);
+	    closeAllTabsExceptOriginal();
 
 	    // Return the map with post owner and user comments
 	    return result;
@@ -383,73 +434,111 @@ public class LoadUserInfor {
 
 
 
+    public static int parseNumber(String numStr) {
+        if (numStr == null || numStr.isEmpty()) {
+            return 0;
+        }
+
+        // Remove commas
+        numStr = numStr.replace(",", "");
+
+        // Check for K and M suffix
+        if (numStr.endsWith("K")) {
+            return (int) (Double.parseDouble(numStr.replace("K", "")) * 1_000);
+        } else if (numStr.endsWith("M")) {
+            return (int) (Double.parseDouble(numStr.replace("M", "")) * 1_000_000);
+        } else {
+            // No suffix, parse directly
+            return Integer.parseInt(numStr);
+        }
+    }
 
 
 
-	public static Map<String, List<String>> findTweetsAndRetweetsWithLinks(String link) {
-	    openNewWindow(link);
-	    List<String> tweetLinks = new ArrayList<>();
-	    List<String> retweetLinks = new ArrayList<>();
-	    JavascriptExecutor js = (JavascriptExecutor) driver;
+    public static Map<String, List> findTweetsAndRetweetsWithLinks(String link) {
+        openNewWindow(link);
+        
+        // Extract follower count as a string
+        String followerCountStr = "";
+        WebElement followerContainer = wait
+                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(., 'Followers')]")));
+        WebElement followerCountElement = followerContainer.findElement(By.xpath(".//span[1]"));
+        followerCountStr = followerCountElement.getText();
 
-	    // Extract the username from the provided link (e.g., https://x.com/elonmusk -> elonmusk)
-	    String username = link.substring(link.lastIndexOf("/") + 1);
+        // Convert follower count string to a numeric string
+        String numericFollowerCountStr = String.valueOf(parseNumber(followerCountStr));
 
-	    // Initial scroll to load some tweets
-	    js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
-	    try {
-	        Thread.sleep(2000); // Wait for new tweets to load (adjust as needed)
-	    } catch (InterruptedException e) {
-	        Thread.currentThread().interrupt(); // Restore interrupted status
-	    }
+        List<String> tweetLinks = new ArrayList<>();
+        List<String> retweetLinks = new ArrayList<>();
+        JavascriptExecutor js = (JavascriptExecutor) driver;
 
-	    // Loop to keep scrolling and collecting tweets
-	    for (int i = 0; i < 3; i++) { // Adjust the number of iterations to load more tweets
-	        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-testid='tweet']")));
+        // Extract the username from the provided link (e.g., https://x.com/elonmusk -> elonmusk)
+        String username = link.substring(link.lastIndexOf("/") + 1);
 
-	        // Collect current tweets
-	        List<WebElement> tweetElements = driver.findElements(By.cssSelector("[data-testid='tweet']"));
+        // Initial scroll to load some tweets
+        js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+        try {
+            Thread.sleep(2000); // Wait for new tweets to load (adjust as needed)
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restore interrupted status
+        }
 
-	        for (WebElement tweetElement : tweetElements) {
-	            // Extract the link from the tweet or retweet
-	            try {
-	                WebElement linkElement = tweetElement.findElement(By.xpath(".//a[contains(@href, '/status/')]"));
-	                String postLink = linkElement.getAttribute("href");
+        // Loop to keep scrolling and collecting tweets
+        for (int i = 0; i < 3; i++) { // Adjust the number of iterations to load more tweets
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-testid='tweet']")));
 
-	                // Check if the post link contains the username (indicating it's from the correct user)
-	                if (postLink.contains(username)) {
-	                    // If the link contains the username, it's a tweet
-	                    tweetLinks.add(postLink);
-	                } else {
-	                    // If the link doesn't contain the username, it's a retweet
-	                    retweetLinks.add(postLink);
-	                }
-	            } catch (NoSuchElementException e) {
-	                // If no link is found, skip this element
-	                continue;
-	            }
-	        }
+            // Collect current tweets
+            List<WebElement> tweetElements = driver.findElements(By.cssSelector("[data-testid='tweet']"));
 
-	        // Scroll down to load more tweets
-	        js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
-	        try {
-	            Thread.sleep(2000); // Wait for new tweets to load
-	        } catch (InterruptedException e) {
-	            Thread.currentThread().interrupt(); // Restore interrupted status
-	        }
-	    }
+            for (WebElement tweetElement : tweetElements) {
+                // Extract the link from the tweet or retweet
+                try {
+                    WebElement linkElement = tweetElement.findElement(By.xpath(".//a[contains(@href, '/status/')]"));
+                    String postLink = linkElement.getAttribute("href");
 
-	    // Print collected tweet links count
-	    System.out.println("Total tweet links: " + tweetLinks.size());
-	    System.out.println("Total retweet links: " + retweetLinks.size());
+                    // Check if the post link contains the username (indicating it's from the correct user)
+                    if (postLink.contains(username)) {
+                        // If the link contains the username, it's a tweet
+                        tweetLinks.add(postLink);
+                    } else {
+                        // If the link doesn't contain the username, it's a retweet
+                        retweetLinks.add(postLink);
+                    }
+                } catch (NoSuchElementException e) {
+                    // If no link is found, skip this element
+                    continue;
+                }
+            }
 
-	    // Return a map containing tweet and retweet links
-	    Map<String, List<String>> tweetDataWithLinks = new HashMap<>();
-	    tweetDataWithLinks.put("tweets", tweetLinks);
-	    tweetDataWithLinks.put("retweets", retweetLinks);
+            // Scroll down to load more tweets
+            js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+            try {
+                Thread.sleep(2000); // Wait for new tweets to load
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // Restore interrupted status
+            }
+        }
 
-	    return tweetDataWithLinks;
-	}
+        // Print collected tweet links count and follower count
+        System.out.println("Total tweet links: " + tweetLinks.size());
+        System.out.println("Total retweet links: " + retweetLinks.size());
+        System.out.println("Follower count: " + numericFollowerCountStr);
+
+        // Return a map containing tweet links, retweet links, and follower count
+        Map<String, List> tweetDataWithLinks = new HashMap<>();
+        tweetDataWithLinks.put("tweets", tweetLinks);
+        tweetDataWithLinks.put("retweets", retweetLinks);
+
+        // Wrap the numeric follower count string in a List
+        List<String> followersList = new ArrayList<>();
+        followersList.add(numericFollowerCountStr);
+        tweetDataWithLinks.put("followers", followersList);
+
+        return tweetDataWithLinks;
+
+    }
+
+
 
 
 	
