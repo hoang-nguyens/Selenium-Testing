@@ -37,75 +37,47 @@ public class LoadUserInfor {
 
 	public static void main(String[] args) {
 		
-		login(0);
 		
-		String testLink = "https://x.com/elonmusk";
+		int startIndex = 638;
+		int batchSize = 3; // Number of KOLs to process per iteration
+		int totalIterations = 50;
+		int accountsCount = 5; // Total accounts available for login
 
-        // Call the method and retrieve the results
-        Map<String, List> result = findTweetsAndRetweetsWithLinks(testLink);
-
-        // Print the results
-        System.out.println("Tweets:");
-        List<String> tweets = (List<String>) result.get("tweets");
-        tweets.forEach(System.out::println);
-
-        System.out.println("\nRetweets:");
-        List<String> retweets = (List<String>) result.get("retweets");
-        retweets.forEach(System.out::println);
-
-        System.out.println("\nFollowers:");
-        List<String> followers = (List<String>) result.get("followers");
-        System.out.println(followers);
-		
-		
-////		List<String> links = readLinksFromCSV("D:\\OOP Project 2024.1\\projecttest\\Web3UsersLink.csv");
-//
-//        // Process a specific range of links (example: index 0 to 9)
-//        int startIndex = 3;
-//        int endIndex = 4;
-
-        // Process the links range
-        //processLinksRange(links, startIndex, endIndex);
-//        processKOLsData("D:\\OOP Project 2024.1\\projecttest\\result.csv", startIndex, endIndex);
-//		int startIndex = 53;
-//		int batchSize = 3; // Number of KOLs to process per iteration
-//		int totalIterations = 10;
-//		int accountsCount = 5; // Total accounts available for login
-//
-//		for (int i = 0; i < totalIterations; i++) {
-//		    int accountIndex = i % accountsCount; // Cycle through accounts
-//		    try {
-//		        login(accountIndex); // Login with the current account
-//		        processKOLsData("D:\\OOP Project 2024.1\\projecttest\\result.csv", startIndex, startIndex + batchSize - 1);
-//		        startIndex += batchSize; // Move to the next batch of KOLs
-//		        System.out.println("Processed up to startIndex: " + startIndex);
-//		    } catch (Exception e) {
-//		        System.err.println("Error during iteration " + i + ": " + e.getMessage());
-//		        e.printStackTrace();
-//		    } finally {
-//		        // Ensure the driver is closed after each iteration to free resources
-//		        if (driver != null) {
-//		            try {
-//		                driver.quit();
-//		            } catch (Exception e) {
-//		                System.err.println("Error closing driver: " + e.getMessage());
-//		            }
-//		        }
-//		    }
-//		}
+		for (int i = 0; i < totalIterations; i++) {
+		    int accountIndex = i % accountsCount; // Cycle through accounts
+		    try {
+		        login(accountIndex); // Login with the current account
+		        processKOLsData("D:\\OOP Project 2024.1\\projecttest\\result.csv", startIndex, startIndex + batchSize - 1);
+		        startIndex += batchSize; // Move to the next batch of KOLs
+		        System.out.println("Processed up to startIndex: " + startIndex);
+		    } catch (Exception e) {
+		        System.err.println("Error during iteration " + i + ": " + e.getMessage());
+		        e.printStackTrace();
+		    } finally {
+		        // Ensure the driver is closed after each iteration to free resources
+		        if (driver != null) {
+		            try {
+		                driver.quit();
+		            } catch (Exception e) {
+		                System.err.println("Error closing driver: " + e.getMessage());
+		            }
+		        }
+		    }
+		}
 
 	}
 	
 	public static void login(int i) {
         driver = new ChromeDriver(); // Ensure driver is initialized
         driver.get("https://twitter.com/login");
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(60));
         List<String> accounts = new ArrayList<>();
-        accounts.add("hihihahade31600");
-        accounts.add("HoangNg31600");
-        accounts.add("Hngy0403");
-        accounts.add("jupite97964");
-        accounts.add("phan315918");
+        
+		accounts.add("xxxxxxxxx");
+        accounts.add("xxxxxxxxx");
+		accounts.add("xxxxxxxxx");
+		accounts.add("xxxxxxxxx");
+		accounts.add("xxxxxxxxx");
         
         WebElement usernameField = wait.until(ExpectedConditions.visibilityOfElementLocated(
             By.cssSelector("[autocapitalize='sentences'][autocomplete='username'][autocorrect='on'][name='text'][spellcheck='true']")));
@@ -220,8 +192,11 @@ public class LoadUserInfor {
 	            String kolUsername = row[0].replace("\"", "").trim();
 	            System.out.println("Processing KOL: " + kolUsername);
 
-	            // Simulated method to fetch tweets and retweets with links
-	            Map<String, List> tweetData = findTweetsAndRetweetsWithLinks("https://x.com/" + kolUsername);
+	            // Fetch tweets, retweets, and followers
+	            Map<String, Object> tweetData = findTweetsAndRetweetsWithLinks("https://x.com/" + kolUsername);
+
+	            // Extract follower count as a string
+	            String followers = (String) tweetData.get("followers");
 
 	            // Maps to store processed data for this KOL
 	            Map<String, String> repostOwnerMap = new HashMap<>();
@@ -229,7 +204,7 @@ public class LoadUserInfor {
 	            Map<String, List<String>> retweetCommentsMap = new HashMap<>();
 
 	            // Process retweets
-	            List<String> retweets = tweetData.get("retweets");
+	            List<String> retweets = (List<String>) tweetData.get("retweets");
 	            for (int j = 0; j < Math.min(retweets.size(), 5); j++) {
 	                String retweetLink = retweets.get(j);
 	                String retweetId = extractPostId(retweetLink); // Extract post ID
@@ -249,7 +224,7 @@ public class LoadUserInfor {
 	            }
 
 	            // Process tweets
-	            List<String> tweets = tweetData.get("tweets");
+	            List<String> tweets = (List<String>) tweetData.get("tweets");
 	            for (int j = 0; j < Math.min(tweets.size(), 5); j++) {
 	                String tweetLink = tweets.get(j);
 	                String tweetId = extractPostId(tweetLink); // Extract post ID
@@ -262,6 +237,7 @@ public class LoadUserInfor {
 
 	            // Create JSON object for this KOL
 	            JSONObject kolData = new JSONObject();
+	            kolData.put("followers", followers); // Add follower count
 	            kolData.put("repostOwner", repostOwnerMap);
 	            kolData.put("tweetComments", tweetCommentsMap);
 	            kolData.put("retweetComments", retweetCommentsMap);
@@ -283,6 +259,7 @@ public class LoadUserInfor {
 	        System.err.println("Error writing to all.json: " + e.getMessage());
 	    }
 	}
+
 
 
 	// Helper method to extract the post ID from a link
@@ -455,9 +432,9 @@ public class LoadUserInfor {
 
 
 
-    public static Map<String, List> findTweetsAndRetweetsWithLinks(String link) {
+    public static Map<String, Object> findTweetsAndRetweetsWithLinks(String link) {
         openNewWindow(link);
-        
+
         // Extract follower count as a string
         String followerCountStr = "";
         WebElement followerContainer = wait
@@ -525,18 +502,14 @@ public class LoadUserInfor {
         System.out.println("Follower count: " + numericFollowerCountStr);
 
         // Return a map containing tweet links, retweet links, and follower count
-        Map<String, List> tweetDataWithLinks = new HashMap<>();
+        Map<String, Object> tweetDataWithLinks = new HashMap<>();
         tweetDataWithLinks.put("tweets", tweetLinks);
         tweetDataWithLinks.put("retweets", retweetLinks);
-
-        // Wrap the numeric follower count string in a List
-        List<String> followersList = new ArrayList<>();
-        followersList.add(numericFollowerCountStr);
-        tweetDataWithLinks.put("followers", followersList);
+        tweetDataWithLinks.put("followers", numericFollowerCountStr); // Store as a plain string
 
         return tweetDataWithLinks;
-
     }
+
 
 
 
